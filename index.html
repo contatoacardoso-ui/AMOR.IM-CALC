@@ -345,7 +345,10 @@
         </div>
 
         <label for="margemLucro" style="margin-top: 15px;">Margem de Lucro (%):</label>
-        <input type="text" id="margemLucro" inputmode="decimal" value="100%" oninput="mascaraPorcentagem(this); calcular();">
+        <input type="text" id="margemLucro" inputmode="decimal" value="100%" 
+               onfocus="ajustarFocoPorcentagem(this)" 
+               onblur="sairFocoPorcentagem(this)" 
+               oninput="mascaraPorcentagem(this); calcular();">
 
         <div class="summary-box" style="background: #eaf4f1; border-color: #a3e4d7; margin-top: 10px;">
             <div class="summary-row" style="font-size: 1.15rem; font-weight: bold; color: #27ae60; margin-bottom: 0;">
@@ -436,10 +439,32 @@
         calcular();
     }
 
+    function ajustarFocoPorcentagem(campo) {
+        let valorLimpo = campo.value.replace(/%/g, "");
+        campo.value = valorLimpo;
+        setTimeout(() => {
+            campo.setSelectionRange(campo.value.length, campo.value.length);
+        }, 10);
+    }
+
+    function sairFocoPorcentagem(campo) {
+        let v = campo.value.replace(/\D/g, "");
+        if (v === "") {
+            campo.value = "0%";
+        } else {
+            campo.value = v + "%";
+        }
+        calcular();
+    }
+
     function mascaraPorcentagem(campo) {
         let v = campo.value.replace(/\D/g, "");
-        if (v === "") { campo.value = ""; calcular(); return; }
-        campo.value = v + "%";
+        if (v === "") {
+            campo.value = "";
+            calcular();
+            return;
+        }
+        campo.value = v;
         calcular();
     }
 
@@ -532,6 +557,8 @@
         
         const nome = document.getElementById('nomePeca').value.trim() || 'Peça sem nome';
         const foto = document.getElementById('fotoBase64').value;
+        let margemVal = document.getElementById('margemLucro').value;
+        if (!margemVal.includes('%')) margemVal += '%';
 
         const pecaData = {
             id: idFinal,
@@ -541,7 +568,7 @@
             valorPacoteArgila: document.getElementById('valorPacoteArgila').value,
             valorBiscoito: document.getElementById('valorBiscoito').value,
             valorEsmalte: document.getElementById('valorEsmalte').value,
-            margemLucro: document.getElementById('margemLucro').value,
+            margemLucro: margemVal,
             transportes: transportes || [],
             precoFinal: document.getElementById('resPrecoVenda').innerText
         };
@@ -593,7 +620,10 @@
         document.getElementById('valorPacoteArgila').value = p.valorPacoteArgila || '';
         document.getElementById('valorBiscoito').value = p.valorBiscoito || '';
         document.getElementById('valorEsmalte').value = p.valorEsmalte || '';
-        document.getElementById('margemLucro').value = p.margemLucro || '100%';
+        
+        let mVal = p.margemLucro || '100%';
+        if (!mVal.includes('%')) mVal += '%';
+        document.getElementById('margemLucro').value = mVal;
         
         document.getElementById('fotoBase64').value = p.foto || '';
         if (p.foto) {
