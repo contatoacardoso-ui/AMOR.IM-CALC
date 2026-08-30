@@ -264,9 +264,8 @@
         <input type="text" id="nomePeca" placeholder="Ex: Caneca Coração #01">
 
         <label for="fotoPeca">Foto da Peça:</label>
-        <!-- Alterado para aceitar captura direta e galeria sem travar em alguns dispositivos -->
         <input type="file" id="fotoPeca" accept="image/*" onchange="converterFoto(this)" style="padding: 8px; background: #fff;">
-        <div class="rule-note">Ao tocar, o celular dará a opção de tirar a foto na hora com a câmera ou escolher da galeria.</div>
+        <div class="rule-note">Toque para tirar foto com a câmera ou escolher da galeria.</div>
 
         <div id="previewContainer" style="text-align:center; margin-top:8px; display:none;">
             <img id="imgPreview" src="" alt="Prévia" style="max-height: 130px; border-radius: 10px; border: 2px solid var(--border-color);">
@@ -374,7 +373,7 @@
     // CONFIGURAÇÃO DO FIREBASE
     // ==========================================
     const firebaseConfig = {
-        databaseURL: "https://financeiro-3fe98-default-rtdb.firebaseio.com/"
+        databaseURL: "https://amorim-calc-default-rtdb.firebaseio.com/"
     };
 
     firebase.initializeApp(firebaseConfig);
