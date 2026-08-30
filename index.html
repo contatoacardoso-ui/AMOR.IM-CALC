@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMOR.IM CALC. - Calculadora de Cerâmica</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #fdf8f2;
+            --card-bg: #fffdf9;
+            --primary: #d96b43;
+            --secondary: #5c8374;
+            --accent: #f4d35e;
+            --text-color: #4a3b32;
+            --border-color: #e6ccb2;
+            --input-bg: #fff7ed;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(217, 107, 67, 0.1);
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(241, 196, 15, 0.4);
+            border: 3px solid #f1c40f;
+            margin-bottom: 8px;
+            overflow: hidden;
+            background-color: #ffeaa7;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin: 4px 0;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: 600;
+            background: #e8f4f1;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 4px;
+        }
+
+        .section {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .section h2 {
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 2px dashed #fceade;
+            padding-bottom: 6px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            margin-bottom: 4px;
+            font-weight: 700;
+            color: #5c4a42;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .row > div {
+            flex: 1;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(217, 107, 67, 0.3);
+            margin-bottom: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            box-shadow: 0 4px 10px rgba(92, 131, 116, 0.3);
+        }
+
+        .transport-item, .peca-card {
+            background: #fdf7f2;
+            border: 1px solid #f0d5c3;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+        }
+
+        .peca-card {
+            background: #fff;
+            border-left: 4px solid var(--primary);
+            gap: 10px;
+        }
+
+        .peca-foto-min {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .transport-item button, .peca-card button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        .peca-card .btn-edit {
+            background: var(--secondary);
+            margin-right: 4px;
+        }
+
+        .summary-box {
+            background: #fff6ee;
+            border: 2px solid #f6d2b1;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 0.9rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .total-highlight {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.15rem;
+            border-top: 2px dashed #f6d2b1;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .rule-note {
+            font-size: 0.75rem;
+            color: #8c7365;
+            background: #f4ece4;
+            padding: 6px 8px;
+            border-radius: 6px;
+            margin-top: -4px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-circle">
+            <svg width="100" height="100" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="95" fill="#ffeaa7"/>
+                <path d="M100 50 C75 25, 35 40, 50 85 C58 110, 85 130, 100 155 C115 130, 142 110, 150 85 C165 40, 125 25, 100 50 Z" fill="#fffaf0" stroke="#6c5ce7" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M85 48 L75 25 M95 45 L95 20 M110 46 L120 22 M125 55 L145 40" fill="none" stroke="#6c5ce7" stroke-width="5" stroke-linecap="round"/>
+                <path d="M70 85 Q85 105 100 120" fill="none" stroke="#6c5ce7" stroke-width="3"/>
+                <ellipse cx="100" cy="85" rx="24" ry="14" fill="#ffffff" stroke="#6c5ce7" stroke-width="3.5"/>
+                <circle cx="100" cy="85" r="8" fill="#0984e3"/>
+                <circle cx="100" cy="85" r="3.5" fill="#2d3436"/>
+                <path d="M76 85 Q100 68 124 85 Q100 102 76 85" fill="none" stroke="#6c5ce7" stroke-width="2.5"/>
+                <line x1="84" y1="73" x2="80" y2="66" stroke="#6c5ce7" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="100" y1="71" x2="100" y2="63" stroke="#6c5ce7" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="116" y1="73" x2="120" y2="66" stroke="#6c5ce7" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <h1>AMOR.IM CALC.</h1>
+        <div class="subtitle">🏺 Calculadora de Cerâmica Artística ✨</div>
+    </div>
+
+    <!-- IDENTIFICAÇÃO E FOTO -->
+    <div class="section">
+        <h2>📸 Identificação & Foto</h2>
+        <input type="hidden" id="pecaId" value="">
+        <label for="nomePeca">Nome / Descrição da Peça:</label>
+        <input type="text" id="nomePeca" placeholder="Ex: Caneca Coração #01">
+
+        <label for="fotoPeca">Foto da Peça:</label>
+        <!-- Alterado para aceitar captura direta e galeria sem travar em alguns dispositivos -->
+        <input type="file" id="fotoPeca" accept="image/*" onchange="converterFoto(this)" style="padding: 8px; background: #fff;">
+        <div class="rule-note">Ao tocar, o celular dará a opção de tirar a foto na hora com a câmera ou escolher da galeria.</div>
+
+        <div id="previewContainer" style="text-align:center; margin-top:8px; display:none;">
+            <img id="imgPreview" src="" alt="Prévia" style="max-height: 130px; border-radius: 10px; border: 2px solid var(--border-color);">
+        </div>
+        <input type="hidden" id="fotoBase64" value="">
+    </div>
+
+    <!-- PESO DA PEÇA -->
+    <div class="section">
+        <h2>⚖️ Peso da Peça</h2>
+        <label for="peso">Peso Final da Peça (kg):</label>
+        <input type="text" id="peso" inputmode="decimal" placeholder="0,000" oninput="mascaraPeso(this); calcular();">
+        <div class="rule-note">Ex: digite 350 para 0,350 kg.</div>
+    </div>
+
+    <!-- CUSTO DA ARGILA -->
+    <div class="section">
+        <h2>🧱 Custo da Argila</h2>
+        <label for="valorPacoteArgila">Valor do Pacote de Argila (10 kg):</label>
+        <input type="text" id="valorPacoteArgila" inputmode="decimal" placeholder="0,00" oninput="mascaraMoeda(this); calcular();">
+    </div>
+
+    <!-- CUSTO DE QUEIMA -->
+    <div class="section">
+        <h2>🔥 Custos de Queima</h2>
+        <div class="row">
+            <div>
+                <label for="valorBiscoito">Biscuit (R$/kg):</label>
+                <input type="text" id="valorBiscoito" inputmode="decimal" placeholder="0,00" oninput="mascaraMoeda(this); calcular();">
+            </div>
+            <div>
+                <label for="valorEsmalte">Esmalte (R$/kg):</label>
+                <input type="text" id="valorEsmalte" inputmode="decimal" placeholder="0,00" oninput="mascaraMoeda(this); calcular();">
+            </div>
+        </div>
+        <div class="rule-note">💡 Abaixo de 1kg cobra 1kg cheio. Acima, fração proporcional.</div>
+    </div>
+
+    <!-- CUSTO DE TRANSPORTE -->
+    <div class="section">
+        <h2>🚚 Custo de Transporte</h2>
+        <label for="descTransporte">Motivo / Descrição:</label>
+        <input type="text" id="descTransporte" placeholder="Ex: Levar para biscoito / Buscar">
+        
+        <div class="row">
+            <div>
+                <label for="valorTransporte">Valor Gasto (R$):</label>
+                <input type="text" id="valorTransporte" inputmode="decimal" placeholder="0,00" oninput="mascaraMoeda(this)">
+            </div>
+            <div>
+                <label for="qtdPecasTransp">Qtd. Peças:</label>
+                <input type="number" id="qtdPecasTransp" inputmode="numeric" min="1" value="1">
+            </div>
+        </div>
+        <button class="btn btn-secondary" onclick="adicionarTransporte()">+ Adicionar Transporte</button>
+        
+        <div id="listaTransportes" style="margin-top: 10px;"></div>
+    </div>
+
+    <!-- RESUMO E PRECIFICAÇÃO -->
+    <div class="section">
+        <h2>💰 Resumo & Sugestão de Venda</h2>
+        <div class="summary-box">
+            <div class="summary-row">
+                <span>Custo da Argila:</span>
+                <span id="resArgila">R$ 0,00</span>
+            </div>
+            <div class="summary-row">
+                <span>Queima (Biscoito + Esmalte):</span>
+                <span id="resQueima">R$ 0,00</span>
+            </div>
+            <div class="summary-row">
+                <span>Transporte (Proporcional):</span>
+                <span id="resTransporte">R$ 0,00</span>
+            </div>
+            <div class="summary-row total-highlight">
+                <span>Total Custo de Produção:</span>
+                <span id="resCustoTotal">R$ 0,00</span>
+            </div>
+        </div>
+
+        <label for="margemLucro" style="margin-top: 15px;">Margem de Lucro (%):</label>
+        <input type="text" id="margemLucro" inputmode="decimal" value="100,00" oninput="mascaraMoeda(this); calcular();">
+
+        <div class="summary-box" style="background: #eaf4f1; border-color: #a3e4d7; margin-top: 10px;">
+            <div class="summary-row" style="font-size: 1.15rem; font-weight: bold; color: #27ae60; margin-bottom: 0;">
+                <span>Preço de Venda:</span>
+                <span id="resPrecoVenda">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="salvarNoFirebase()">💾 Salvar na Nuvem (Firebase)</button>
+    <button class="btn btn-secondary" onclick="limparFormulario()" style="background:#b2bec3;">🔄 Novo / Limpar Tela</button>
+
+    <!-- LISTA DE PEÇAS EM ANDAMENTO (FIREBASE) -->
+    <div class="section" style="margin-top: 25px;">
+        <h2>☁️ Suas Peças no Firebase</h2>
+        <div id="listaPecasFirebase">Carregando da nuvem...</div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // CONFIGURAÇÃO DO FIREBASE
+    // ==========================================
+    const firebaseConfig = {
+        databaseURL: "https://financeiro-3fe98-default-rtdb.firebaseio.com/"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const dbRef = firebase.database().ref('amor_im_pecas');
+
+    let transportes = [];
+
+    function converterFoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 300;
+                    const MAX_HEIGHT = 300;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('fotoBase64').value = dataUrl;
+                    document.getElementById('imgPreview').src = dataUrl;
+                    document.getElementById('previewContainer').style.display = 'block';
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function mascaraMoeda(campo) {
+        let v = campo.value.replace(/\D/g, "");
+        if (v === "") { campo.value = ""; calcular(); return; }
+        v = (parseFloat(v) / 100).toFixed(2);
+        v = v.replace(".", ",");
+        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        campo.value = v;
+        calcular();
+    }
+
+    function mascaraPeso(campo) {
+        let v = campo.value.replace(/\D/g, "");
+        if (v === "") { campo.value = ""; calcular(); return; }
+        v = (parseFloat(v) / 1000).toFixed(3);
+        v = v.replace(".", ",");
+        campo.value = v;
+        calcular();
+    }
+
+    function converterParaNumero(valorStr) {
+        if (!valorStr) return 0;
+        let limpo = valorStr.toString().replace(/\./g, "").replace(",", ".");
+        return parseFloat(limpo) || 0;
+    }
+
+    function formatarMoeda(valor) {
+        return "R$ " + valor.toFixed(2).replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    }
+
+    function adicionarTransporte() {
+        const desc = document.getElementById('descTransporte').value.trim() || 'Transporte';
+        const valor = converterParaNumero(document.getElementById('valorTransporte').value);
+        const qtd = parseInt(document.getElementById('qtdPecasTransp').value) || 1;
+
+        if (valor <= 0) {
+            alert('Informe um valor de transporte válido.');
+            return;
+        }
+
+        const custoUnitario = valor / qtd;
+        transportes.push({ desc, valor, qtd, custoUnitario });
+
+        document.getElementById('descTransporte').value = '';
+        document.getElementById('valorTransporte').value = '';
+        document.getElementById('qtdPecasTransp').value = '1';
+
+        atualizarListaTransportes();
+        calcular();
+    }
+
+    function removerTransporte(index) {
+        transportes.splice(index, 1);
+        atualizarListaTransportes();
+        calcular();
+    }
+
+    function atualizarListaTransportes() {
+        const container = document.getElementById('listaTransportes');
+        container.innerHTML = '';
+        if (transportes.length === 0) {
+            container.innerHTML = '<div style="font-size: 0.78rem; color: #a69286; text-align:center; padding: 4px;">Nenhum transporte lançado.</div>';
+            return;
+        }
+        transportes.forEach((t, index) => {
+            container.innerHTML += `
+                <div class="transport-item">
+                    <div><strong>${t.desc}</strong><br>R$ ${t.valor.toFixed(2).replace('.', ',')} (${t.qtd} pçs) ➔ <em>${formatarMoeda(t.custoUnitario)}/pça</em></div>
+                    <button onclick="removerTransporte(${index})">✕</button>
+                </div>
+            `;
+        });
+    }
+
+    function calcular() {
+        const peso = converterParaNumero(document.getElementById('peso').value);
+        const valorPacoteArgila = converterParaNumero(document.getElementById('valorPacoteArgila').value);
+        const vBiscoito = converterParaNumero(document.getElementById('valorBiscoito').value);
+        const vEsmalte = converterParaNumero(document.getElementById('valorEsmalte').value);
+        const margem = converterParaNumero(document.getElementById('margemLucro').value);
+
+        const custoArgilaPorKg = valorPacoteArgila / 10;
+        const totalArgila = peso * custoArgilaPorKg;
+
+        let pesoCalculo = peso > 0 && peso < 1 ? 1 : peso;
+        if (peso === 0) pesoCalculo = 0;
+
+        const custoBiscoito = pesoCalculo * vBiscoito;
+        const custoEsmalte = pesoCalculo * vEsmalte;
+        const totalQueima = custoBiscoito + custoEsmalte;
+
+        const totalTransporteUnitario = transportes.reduce((acc, t) => acc + t.custoUnitario, 0);
+
+        const custoTotal = totalArgila + totalQueima + totalTransporteUnitario;
+        const precoVenda = custoTotal * (1 + (margem / 100));
+
+        document.getElementById('resArgila').innerText = formatarMoeda(totalArgila);
+        document.getElementById('resQueima').innerText = formatarMoeda(totalQueima);
+        document.getElementById('resTransporte').innerText = formatarMoeda(totalTransporteUnitario);
+        document.getElementById('resCustoTotal').innerText = formatarMoeda(custoTotal);
+        document.getElementById('resPrecoVenda').innerText = formatarMoeda(precoVenda);
+    }
+
+    function salvarNoFirebase() {
+        const idExistente = document.getElementById('pecaId').value;
+        const idFinal = idExistente ? idExistente : dbRef.push().key;
+        
+        const nome = document.getElementById('nomePeca').value.trim() || 'Peça sem nome';
+        const foto = document.getElementById('fotoBase64').value;
+
+        const pecaData = {
+            id: idFinal,
+            nome: nome,
+            foto: foto,
+            peso: document.getElementById('peso').value,
+            valorPacoteArgila: document.getElementById('valorPacoteArgila').value,
+            valorBiscoito: document.getElementById('valorBiscoito').value,
+            valorEsmalte: document.getElementById('valorEsmalte').value,
+            margemLucro: document.getElementById('margemLucro').value,
+            transportes: transportes || [],
+            precoFinal: document.getElementById('resPrecoVenda').innerText
+        };
+
+        dbRef.child(idFinal).set(pecaData).then(() => {
+            alert(`✨ Peça "${nome}" salva com sucesso no Firebase!`);
+            limparFormulario();
+        }).catch((error) => {
+            alert('Erro ao salvar no Firebase: ' + error.message);
+        });
+    }
+
+    dbRef.on('value', (snapshot) => {
+        const container = document.getElementById('listaPecasFirebase');
+        container.innerHTML = '';
+        const data = snapshot.val();
+
+        if (!data) {
+            container.innerHTML = '<div style="font-size: 0.78rem; color: #a69286; text-align:center; padding: 4px;">Nenhuma peça na nuvem ainda.</div>';
+            return;
+        }
+
+        Object.keys(data).forEach(key => {
+            const p = data[key];
+            const fotoTag = p.foto ? `<img src="${p.foto}" class="peca-foto-min">` : `<div class="peca-foto-min" style="background:#eee; display:flex; align-items:center; justify-content:center; font-size:9px; text-align:center; color:#777;">Sem foto</div>`;
+
+            container.innerHTML += `
+                <div class="peca-card">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        ${fotoTag}
+                        <div>
+                            <strong>${p.nome}</strong><br>
+                            <span style="font-size:0.75rem; color:#5c8374;">Venda: <strong>${p.precoFinal}</strong></span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn-edit" onclick='carregarPecaFirebase(${JSON.stringify(p)})'>Abrir</button>
+                        <button onclick="excluirPecaFirebase('${p.id}')">Excluir</button>
+                    </div>
+                </div>
+            `;
+        });
+    });
+
+    function carregarPecaFirebase(p) {
+        document.getElementById('pecaId').value = p.id;
+        document.getElementById('nomePeca').value = p.nome;
+        document.getElementById('peso').value = p.peso || '';
+        document.getElementById('valorPacoteArgila').value = p.valorPacoteArgila || '';
+        document.getElementById('valorBiscoito').value = p.valorBiscoito || '';
+        document.getElementById('valorEsmalte').value = p.valorEsmalte || '';
+        document.getElementById('margemLucro').value = p.margemLucro || '100,00';
+        
+        document.getElementById('fotoBase64').value = p.foto || '';
+        if (p.foto) {
+            document.getElementById('imgPreview').src = p.foto;
+            document.getElementById('previewContainer').style.display = 'block';
+        } else {
+            document.getElementById('previewContainer').style.display = 'none';
+        }
+
+        transportes = p.transportes || [];
+        atualizarListaTransportes();
+        calcular();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function excluirPecaFirebase(id) {
+        if (confirm('Deseja excluir esta peça do Firebase?')) {
+            dbRef.child(id).remove();
+        }
+    }
+
+    function limparFormulario() {
+        document.getElementById('pecaId').value = '';
+        document.getElementById('nomePeca').value = '';
+        document.getElementById('peso').value = '';
+        document.getElementById('valorPacoteArgila').value = '';
+        document.getElementById('valorBiscoito').value = '';
+        document.getElementById('valorEsmalte').value = '';
+        document.getElementById('margemLucro').value = '100,00';
+        document.getElementById('fotoBase64').value = '';
+        document.getElementById('fotoPeca').value = '';
+        document.getElementById('previewContainer').style.display = 'none';
+        transportes = [];
+        atualizarListaTransportes();
+        calcular();
+    }
+</script>
+
+</body>
+</html>
