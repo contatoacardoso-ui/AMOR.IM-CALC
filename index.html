@@ -270,10 +270,10 @@
         <input type="hidden" id="fotoBase64" value="">
     </div>
 
-    <!-- PESO DA PEÇA -->
+    <!-- QTDE ARGILA -->
     <div class="section">
-        <h2>⚖️ Peso da Peça</h2>
-        <label for="peso">Peso Final da Peça (kg):</label>
+        <h2>⚖️ QTDE Argila</h2>
+        <label for="peso">QTDE Argila (kg):</label>
         <input type="text" id="peso" inputmode="decimal" placeholder="0,000" oninput="mascaraPeso(this); calcular();">
         <div class="rule-note">Ex: digite 350 para 0,350 kg.</div>
     </div>
@@ -281,7 +281,7 @@
     <!-- CUSTO DA ARGILA -->
     <div class="section">
         <h2>🧱 Custo da Argila</h2>
-        <label for="valorPacoteArgila">Valor do Pacote de Argila (10 kg):</label>
+        <label for="valorPacoteArgila">Valor Pacote (10kg):</label>
         <input type="text" id="valorPacoteArgila" inputmode="decimal" placeholder="0,00" oninput="mascaraMoeda(this); calcular();">
     </div>
 
@@ -290,7 +290,7 @@
         <h2>🔥 Custos de Queima</h2>
         <div class="row">
             <div>
-                <label for="valorBiscoito">Biscuit (R$/kg):</label>
+                <label for="valorBiscoito">Biscoito (R$/kg):</label>
                 <input type="text" id="valorBiscoito" inputmode="decimal" placeholder="0,00" oninput="mascaraMoeda(this); calcular();">
             </div>
             <div>
@@ -304,7 +304,7 @@
     <!-- CUSTO DE TRANSPORTE -->
     <div class="section">
         <h2>🚚 Custo de Transporte</h2>
-        <label for="descTransporte">Motivo / Descrição:</label>
+        <label for="descTransporte">Descrição:</label>
         <input type="text" id="descTransporte" placeholder="Ex: Levar para biscoito / Buscar">
         
         <div class="row">
@@ -345,7 +345,7 @@
         </div>
 
         <label for="margemLucro" style="margin-top: 15px;">Margem de Lucro (%):</label>
-        <input type="text" id="margemLucro" inputmode="decimal" value="100,00" oninput="mascaraMoeda(this); calcular();">
+        <input type="text" id="margemLucro" inputmode="decimal" value="100%" oninput="mascaraPorcentagem(this); calcular();">
 
         <div class="summary-box" style="background: #eaf4f1; border-color: #a3e4d7; margin-top: 10px;">
             <div class="summary-row" style="font-size: 1.15rem; font-weight: bold; color: #27ae60; margin-bottom: 0;">
@@ -355,7 +355,7 @@
         </div>
     </div>
 
-    <button class="btn" onclick="salvarNoFirebase()">💾 Salvar na Nuvem (Firebase)</button>
+    <button class="btn" onclick="salvarNoFirebase()">Salvar</button>
     <button class="btn btn-secondary" onclick="limparFormulario()" style="background:#b2bec3;">🔄 Novo / Limpar Tela</button>
 
     <!-- LISTA DE PEÇAS EM ANDAMENTO (FIREBASE) -->
@@ -436,9 +436,16 @@
         calcular();
     }
 
+    function mascaraPorcentagem(campo) {
+        let v = campo.value.replace(/\D/g, "");
+        if (v === "") { campo.value = ""; calcular(); return; }
+        campo.value = v + "%";
+        calcular();
+    }
+
     function converterParaNumero(valorStr) {
         if (!valorStr) return 0;
-        let limpo = valorStr.toString().replace(/\./g, "").replace(",", ".");
+        let limpo = valorStr.toString().replace(/%/g, "").replace(/\./g, "").replace(",", ".");
         return parseFloat(limpo) || 0;
     }
 
@@ -586,7 +593,7 @@
         document.getElementById('valorPacoteArgila').value = p.valorPacoteArgila || '';
         document.getElementById('valorBiscoito').value = p.valorBiscoito || '';
         document.getElementById('valorEsmalte').value = p.valorEsmalte || '';
-        document.getElementById('margemLucro').value = p.margemLucro || '100,00';
+        document.getElementById('margemLucro').value = p.margemLucro || '100%';
         
         document.getElementById('fotoBase64').value = p.foto || '';
         if (p.foto) {
@@ -615,7 +622,7 @@
         document.getElementById('valorPacoteArgila').value = '';
         document.getElementById('valorBiscoito').value = '';
         document.getElementById('valorEsmalte').value = '';
-        document.getElementById('margemLucro').value = '100,00';
+        document.getElementById('margemLucro').value = '100%';
         document.getElementById('fotoBase64').value = '';
         document.getElementById('fotoPeca').value = '';
         document.getElementById('previewContainer').style.display = 'none';
