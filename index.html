@@ -260,8 +260,9 @@
         <input type="text" id="nomePeca" placeholder="Ex: Caneca Coração #01">
 
         <label for="fotoPeca">Foto da Peça:</label>
-        <input type="file" id="fotoPeca" accept="image/*" capture="environment" onchange="converterFoto(this)" style="padding: 8px; background: #fff;">
-        <div class="rule-note">Toque para abrir a câmera ou escolher da galeria.</div>
+        <!-- Removido o capture para permitir que o celular pergunte se quer usar a Câmera ou a Galeria/Arquivos -->
+        <input type="file" id="fotoPeca" accept="image/*" onchange="converterFoto(this)" style="padding: 8px; background: #fff;">
+        <div class="rule-note">Toque para tirar foto com a câmera ou escolher arquivo da galeria.</div>
 
         <div id="previewContainer" style="text-align:center; margin-top:8px; display:none;">
             <img id="imgPreview" src="" alt="Prévia" style="max-height: 130px; border-radius: 10px; border: 2px solid var(--border-color);">
