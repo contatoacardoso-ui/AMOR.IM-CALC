@@ -165,6 +165,29 @@
             box-shadow: 0 4px 10px rgba(92, 131, 116, 0.3);
         }
 
+        .btn-foto {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--secondary);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .btn-foto:active {
+            transform: scale(0.98);
+        }
+
         .transport-item, .peca-card {
             background: #fdf7f2;
             border: 1px solid #f0d5c3;
@@ -259,10 +282,25 @@
         <label for="nomePeca">Nome / Descrição da Peça:</label>
         <input type="text" id="nomePeca" placeholder="Ex: Caneca Coração #01">
 
-        <label for="fotoPeca">Foto da Peça:</label>
-        <!-- Removido o capture para permitir que o celular pergunte se quer usar a Câmera ou a Galeria/Arquivos -->
-        <input type="file" id="fotoPeca" accept="image/*" onchange="converterFoto(this)" style="padding: 8px; background: #fff;">
-        <div class="rule-note">Toque para tirar foto com a câmera ou escolher arquivo da galeria.</div>
+        <label>Adicionar Foto:</label>
+        <div class="row">
+            <!-- Botão 1: Abre a Câmera diretamente -->
+            <div>
+                <label for="fotoCamera" class="btn-foto" style="background-color: var(--primary);">
+                    📷 Tirar Foto
+                </label>
+                <input type="file" id="fotoCamera" accept="image/*" capture="environment" onchange="converterFoto(this)" style="display: none;">
+            </div>
+            <!-- Botão 2: Escolher Arquivo / Galeria -->
+            <div>
+                <label for="fotoGaleria" class="btn-foto">
+                    📁 Escolher Arquivo
+                </label>
+                <input type="file" id="fotoGaleria" accept="image/*" onchange="converterFoto(this)" style="display: none;">
+            </div>
+        </div>
+        
+        <div class="rule-note">Use "Tirar Foto" para abrir a câmera ou "Escolher Arquivo" para pegar da galeria.</div>
 
         <div id="previewContainer" style="text-align:center; margin-top:8px; display:none;">
             <img id="imgPreview" src="" alt="Prévia" style="max-height: 130px; border-radius: 10px; border: 2px solid var(--border-color);">
@@ -654,7 +692,8 @@
         document.getElementById('valorEsmalte').value = '';
         document.getElementById('margemLucro').value = '100%';
         document.getElementById('fotoBase64').value = '';
-        document.getElementById('fotoPeca').value = '';
+        document.getElementById('fotoCamera').value = '';
+        document.getElementById('fotoGaleria').value = '';
         document.getElementById('previewContainer').style.display = 'none';
         transportes = [];
         atualizarListaTransportes();
