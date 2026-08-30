@@ -166,22 +166,23 @@
         }
 
         .btn-foto {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             background-color: var(--secondary);
             color: white;
-            padding: 12px;
+            padding: 12px 8px;
             border-radius: 10px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             cursor: pointer;
             text-align: center;
             border: none;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
             width: 100%;
-            margin-bottom: 8px;
+            box-sizing: border-box;
+            white-space: nowrap;
         }
 
         .btn-foto:active {
@@ -284,23 +285,24 @@
 
         <label>Adicionar Foto:</label>
         <div class="row">
-            <!-- Botão 1: Abre a Câmera diretamente -->
+            <!-- Botão 1: Ícone de Câmera para tirar foto -->
             <div>
                 <label for="fotoCamera" class="btn-foto" style="background-color: var(--primary);">
-                    📷 Tirar Foto
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    Câmera
                 </label>
                 <input type="file" id="fotoCamera" accept="image/*" capture="environment" onchange="converterFoto(this)" style="display: none;">
             </div>
             <!-- Botão 2: Escolher Arquivo / Galeria -->
             <div>
                 <label for="fotoGaleria" class="btn-foto">
-                    📁 Escolher Arquivo
+                    📁 Arquivo
                 </label>
                 <input type="file" id="fotoGaleria" accept="image/*" onchange="converterFoto(this)" style="display: none;">
             </div>
         </div>
         
-        <div class="rule-note">Use "Tirar Foto" para abrir a câmera ou "Escolher Arquivo" para pegar da galeria.</div>
+        <div class="rule-note" style="margin-top: 8px;">Use "Câmera" para tirar na hora ou "Arquivo" para pegar da galeria.</div>
 
         <div id="previewContainer" style="text-align:center; margin-top:8px; display:none;">
             <img id="imgPreview" src="" alt="Prévia" style="max-height: 130px; border-radius: 10px; border: 2px solid var(--border-color);">
